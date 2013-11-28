@@ -5,5 +5,4 @@
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [incanter "1.5.4"]]
-  :jvm-opts ["-Xmx1g" "-server"]
-  :main clj-dimension.process-data)
+  :jvm-opts ["-Xmx1g" "-server"])
