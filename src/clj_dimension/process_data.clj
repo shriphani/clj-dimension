@@ -1,73 +1,51 @@
 (ns clj-dimension.process-data
-  "Deal with the usual mess of data")
+  "Deal with the usual mess of data"
+  (:use [clojure.java.io :as io])
+  (:import [java.io BufferedReader StringReader]))
 
-(defn read-csv
-  "Expects comma-separated file. Relies on jvm to close fd"
-  [a-csv-file & kwargs]
-  (let [line-op (fn [a-line]
-                  (clojure.string/split a-line
-                                        #","))
+(defn handle-data-file
+  [a-data-file & options]
+  
+  (let [lines (-> a-data-file
+                  io/reader
+                  line-seq)]
+    (if (some #{:ignore-first}
+              (set options))
+      (rest lines) lines)))
+
+(defn open-prices-only  
+  "Produce a NASDAQ dataset with only opening prices"
+  [nasdaq-data-path]
+  (let [only-prices (fn [data-files]
+                      (filter
+                       (fn [a-data-file]
+                         (re-find #"daily_prices"
+                                  (.getAbsolutePath
+                                   a-data-file)))
+                       data-files))
         
-        rs      (->> a-csv-file
-                     clojure.java.io/reader
-                     line-seq
-                     (map line-op))
-
-        ign-fst (:ignore-first (apply hash-map kwargs))]
+        data-files  (->> nasdaq-data-path
+                         clojure.java.io/file
+                         file-seq
+                         rest
+                         only-prices)]
     
-    (if ign-fst (rest rs) rs)))
+    (doseq [a-data-file data-files]
+      (let [lines (handle-data-file a-data-file :ignore-first)
+            spl   (map
+                   #(clojure.string/split % #",")
+                   lines)
+            outs  (map
+                   #(str (nth % 1)
+                         ","
+                         (nth % 2)
+                         ","
+                         (nth % 3))
+                   spl)]
+        (doseq [out outs]
+          (println out))))))
 
-(defn handle-lines
-  [lines-seq]
-  (map #(-> [(nth % 1)
-             (nth % 2)
-             (nth % 3)])
-       lines-seq))
-
-(defn stream->map
-  "Expected data-format [Ticker Item]"
-  [a-stream]
-  (reduce
-   (fn [acc [ticker d x]]
-     (merge-with concat acc {ticker [[d x]]}))
-   {}
-   a-stream))
-
-(defn write-data
-  [loc symbols mapped]
-  (let [row-one (clojure.string/join "," symbols)
-
-        data    (apply map vector (map #(mapped %) symbols))]
-    
-    (with-open [wrtr (clojure.java.io/writer loc)]
-      (binding [*out* wrtr]
-        (do (println row-one)
-            (doseq [symbol symbols]
-              '*))))))
-
-(defn nasdaq->stock-wise
-  "Produce a NASDAQ table where columns = companies and rows = days with only
-   opening price
-
-   Args:
-    nasdaq-data-path : the path to the nasdaq dataset
-    destination-csv : "
-  [nasdaq-data-path destination-csv]
-  (let [data-files (->> nasdaq-data-path
-                        clojure.java.io/file
-                        file-seq
-                        rest
-                        (filter
-                         (fn [a-data-file]
-                           (re-find #"daily_prices"
-                                    (.getAbsolutePath
-                                     a-data-file)))))
-        
-        stream     (map
-                    (fn [a-data-file]
-                      (-> a-data-file
-                          (read-csv :ignore-first true)
-                          handle-lines))
-                    data-files)]
-    
-    stream))
+(defn -main
+  [& args]
+  (let [in-file (first args)]
+    (open-prices-only in-file)))
