@@ -1,14 +1,9 @@
 # clj_dimension
 
-A Clojure library designed to ... well, that part is up to you.
+Shriphani learns to reduce dimensions.
 
-## Usage
+Dataset: NASDAQ 1970 - 2010 from [here](http://www.infochimps.com/datasets/nasdaq-exchange-daily-1970-2010-open-close-high-low-and-volume/)
 
-FIXME
+Implemented so far:
 
-## License
-
-Copyright © 2013 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+ * Grassberger-Proccacia algorithm:
