@@ -45,7 +45,18 @@
         (doseq [out outs]
           (println out))))))
 
+(defn open-prices->date-wise
+  [open-prices-data]
+  (let [lines (-> open-prices-data
+                  io/reader
+                  line-seq)
+
+        data  (map
+               #(clojure.string/split % #",")
+               lines)]
+    (println (take 10 data))))
+
 (defn -main
   [& args]
   (let [in-file (first args)]
-    (open-prices-only in-file)))
+    (open-prices->date-wise in-file)))
