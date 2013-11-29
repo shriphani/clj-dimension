@@ -1,5 +1,6 @@
 (ns clj-dimension.estimation.demo
-  "A demo of dimension estimation algorithms")
+  "A demo of dimension estimation algorithms"
+  (:use [clj-dimension.estimation.correlation-integral]))
 
 (defn demo-grassberger-procaccia
   [& options]
