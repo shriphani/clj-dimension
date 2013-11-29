@@ -4,9 +4,8 @@
 
 (defn demo-grassberger-procaccia
   [& options]
-  (if (some #{:show-plot})
-    (estimate-dimension
-     (get-dataset :iris)
-     :show-plot)
-    (estimate-dimension
-     (get-dataset :iris))))
+  (if (some #{:show-plot} options)
+    (estimate-dimension (get-dataset :iris)
+                        :show-plot)
+    (estimate-dimension (get-dataset :iris))))
+
