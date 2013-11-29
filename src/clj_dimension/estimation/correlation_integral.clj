@@ -6,18 +6,17 @@
 (defn plot-corr-integral
   [dist-counts]
   (line-chart
-   (map #(-> % first Math/log) dist-counts)
-   (map #(-> % second Math/log) dist-counts)
+   (map #(-> % first Math/log) (rest dist-counts))
+   (map #(-> % second Math/log) (rest dist-counts))
    :x-label "log(Distance)"
    :y-label "log(Number of Pairs)"))
 
 (defn corr-integral-slope
   [dist-counts]
-  (let [xs (rest (map #(-> % first Math/log) ; discarding the first
-                                             ; guy cuz distance can be 0
-                      dist-counts))
-        ys (rest (map #(-> % second Math/log)
-                      dist-counts))
+  (let [xs (map #(-> % first Math/log) 
+                (rest dist-counts)) ; first guy can be 0
+        ys (map #(-> % second Math/log)
+                (rest dist-counts))
         sum-x  (apply + xs)
         sum-x2 (apply + (map #(* % %) xs))
         sum-y  (apply + ys)
