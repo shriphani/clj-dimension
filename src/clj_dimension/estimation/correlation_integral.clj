@@ -13,28 +13,9 @@
 
 (defn corr-integral-slope
   [dist-counts]
-  (let [xs (map #(-> % first Math/log) 
-                (rest dist-counts)) ; first guy can be 0
-        ys (map #(-> % second Math/log)
-                (rest dist-counts))
-        sum-x  (apply + xs)
-        sum-x2 (apply + (map #(* % %) xs))
-        sum-y  (apply + ys)
-        sum-y2 (apply + (map #(* % %) ys))
-        sum-xy (apply + (map
-                         (fn [[x y]] (* x y))
-                         (map vector xs ys)))
-        
-        slope  (/ (- sum-xy (/ (* sum-x sum-y)
-                               (count xs)))
-                  
-                  (- sum-x2 (/ (* sum-x sum-x)
-                               (count xs))))
-        
-        int    (/ (- sum-y (* slope sum-x))
-                  (count xs))]
-    {:slope slope
-     :intercept int}))
+  (let [xs (map #(-> % first Math/log) (rest dist-counts))
+        ys (map #(-> % second Math/log) (rest dist-counts))]
+    (simple-regression ys xs)))
 
 (defn distance-vs-count
   "Expected data-structure:
@@ -89,6 +70,6 @@
       (do
         (when (some #{:show-plot} options)
           (view plot-obj))
-        {:estimated-dimension (-> solution :slope)
+        {:estimated-dimension (-> solution :coefs last)
          :dataset-dimension   (ncol the-matrix)
          :solution            solution}))))
