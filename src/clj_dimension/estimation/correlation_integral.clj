@@ -5,7 +5,7 @@
 
 (defn plot-corr-integral
   [dist-counts]
-  (line-chart
+  (scatter-plot
    (map #(-> % first Math/log) (rest dist-counts))
    (map #(-> % second Math/log) (rest dist-counts))
    :x-label "log(Distance)"
